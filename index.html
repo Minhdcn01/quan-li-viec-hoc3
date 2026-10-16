@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Study Planner Dashboard</title>
+  <style>
+    /* --- CSS RESET & VARIABLES --- */
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
+      --accent-green: #10b981;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); padding-bottom: 40px; }
+
+    /* --- NAVIGATION BAR --- */
+    nav {
+      position: sticky; top: 0; background: var(--card-bg); z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow);
+    }
+    nav .logo { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+    nav ul { display: flex; list-style: none; gap: 1.5rem; }
+    nav a { text-decoration: none; color: var(--text-muted); font-weight: 600; transition: 0.2s; }
+    nav a:hover { color: var(--primary); }
+
+    /* --- LAYOUT CONTAINER --- */
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 2.5rem; }
+    .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+
+    /* --- CARD STYLE --- */
+    .card { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--shadow); }
+
+    /* --- KHỐI 1: DASHBOARD & SCHEDULE --- */
+    .countdown-box { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; text-align: center; }
+    .countdown-box h3 { font-size: 1.1rem; opacity: 0.9; }
+    .countdown-timer { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+    th { background-color: #f8fafc; color: var(--text-muted); }
+
+    /* --- KHỐI 2: TASK TRACKER --- */
+    .task-input-group { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    input, select, button { padding: 0.6rem 0.8rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; }
+    input[type="text"] { flex: 1; }
+    button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: 600; }
+    button:hover { background: var(--primary-hover); }
+
+    .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: white; }
+    .badge-red { background: var(--accent-red); }
+    .badge-yellow { background: var(--accent-yellow); }
+    .badge-green { background: var(--accent-green); }
+
+    /* --- KHỐI 3: GPA CALCULATOR --- */
+    .gpa-display { text-align: center; padding: 1rem; }
+    .gpa-score { font-size: 3rem; font-weight: 800; color: var(--primary); }
+
+    /* --- KHỐI 4: RESOURCES & NOTES --- */
+    .resource-link { display: block; padding: 0.75rem; background: #f8fafc; border-radius: 6px; text-decoration: none; color: var(--primary); font-weight: 600; margin-bottom: 0.5rem; border: 1px solid var(--border-color); }
+    .resource-link:hover { background: #eef2ff; }
+    textarea { width: 100%; height: 100px; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); resize: none; margin-bottom: 0.5rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      nav ul { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <nav>
+    <div class="logo">🎓 StudyPlanner</div>
+    <ul>
+      <li><a href="#schedule">Lịch học</a></li>
+      <li><a href="#tasks">Bài tập</a></li>
+      <li><a href="#gpa">Mục tiêu GPA</a></li>
+      <li><a href="#resources">Tài nguyên & Ghi chú</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+
+    <!-- KHỐI 1: TỔNG QUAN & LỊCH HỌC -->
+    <section id="schedule">
+      <h2 class="section-title">📅 Khối 1: Tổng Quan & Lịch Học</h2>
+      <div class="grid-2">
+        <!-- Thời khóa biểu tuần -->
+        <div class="card">
+          <h3>Thời Khóa Biểu Học Kỳ</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Thứ</th>
+                <th>Môn học</th>
+                <th>Thời gian</th>
+                <th>Phòng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Thứ 2</td>
+                <td>Lập trình Web</td>
+                <td>07:30 - 09:30</td>
+                <td>A1-202</td>
+              </tr>
+              <tr>
+                <td>Thứ 4</td>
+                <td>Cơ sở dữ liệu</td>
+                <td>09:30 - 11:30</td>
+                <td>B2-105</td>
+              </tr>
+              <tr>
+                <td>Thứ 6</td>
+                <td>Kiến trúc phần mềm</td>
+                <td>13:00 - 15:00</td>
+                <td>C3-301</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Đồng hồ đếm ngược -->
+        <div class="card countdown-box">
+          <h3>⏳ Đếm Ngược Thi Cuối Kỳ</h3>
+          <div class="countdown-timer" id="timer">00d : 00h</div>
+          <p>Môn: Lập trình Web (25/11/2026)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KHỐI 2: QUẢN LÝ BÀI TẬP & NHIỆM VỤ -->
+    <section id="tasks">
+      <h2 class="section-title">✅ Khối 2: Quản Lý Bài Tập & Deadline</h2>
+      <div class="card">
+        <div class="task-input-group">
+          <input type="text" id="taskInput" placeholder="Nhập bài tập/nhiệm vụ mới...">
+          <select id="prioritySelect">
+            <option value="Bình thường">Bình thường</option>
+            <option value="Quan trọng">Quan trọng</option>
+            <option value="Gấp">Gấp</option>
+          </select>
+          <button onclick="addTask()">Thêm bài tập</button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Trạng thái</th>
+              <th>Tên bài tập</th>
+              <th>Mức độ</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="taskList">
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>Làm bài tập Báo cáo Lập trình Web</td>
+              <td><span class="badge badge-red">Gấp</span></td>
+              <td><button onclick="deleteTask(this)" style="background:var(--accent-red)">Xóa</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>Đọc chương 3 - Cơ sở dữ liệu</td>
+              <td><span class="badge badge-yellow">Quan trọng</span></td>
+              <td><button onclick="deleteTask(this)" style="background:var(--accent-red)">Xóa</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- KHỐI 3: THEO DÕI MỤC TIÊU & ĐIỂM SỐ (GPA) -->
+    <section id="gpa">
+      <h2 class="section-title">📊 Khối 3: Theo Dõi Mục Tiêu & GPA</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Bảng Tính Điểm GPA Dự Phóng</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Tên môn học</th>
+                <th>Số tín chỉ</th>
+                <th>Điểm dự kiến (Hệ 4)</th>
+              </tr>
+            </thead>
+            <tbody id="gpaTable">
+              <tr>
+                <td>Lập trình Web</td>
+                <td><input type="number" class="credits" value="3" min="1" onchange="calculateGPA()"></td>
+                <td><input type="number" class="grade" value="4.0" step="0.1" min="0" max="4" onchange="calculateGPA()"></td>
+              </tr>
+              <tr>
+                <td>Cơ sở dữ liệu</td>
+                <td><input type="number" class="credits" value="3" min="1" onchange="calculateGPA()"></td>
+                <td><input type="number" class="grade" value="3.5" step="0.1" min="0" max="4" onchange="calculateGPA()"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card gpa-display">
+          <h3>GPA Dự Phóng Học Kỳ</h3>
+          <div class="gpa-score" id="gpaResult">3.75</div>
+          <p>Mục tiêu cá nhân: <strong>3.60 / 4.0</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KHỐI 4: KHO TÀI NGUYÊN & GHI CHÚ -->
+    <section id="resources">
+      <h2 class="section-title">📁 Khối 4: Kho Tài Nguyên & Ghi Chú Nhanh</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Liên Kết Tài Liệu Học Tập</h3>
+          <a href="#" class="resource-link">📂 Folder Google Drive Bài Giảng Học Kỳ</a>
+          <a href="#" class="resource-link">📚 Thư viện Slide & Ebook Môn Lập Trình</a>
+          <a href="#" class="resource-link">🔗 Link Zoom / Google Meet Phòng Học</a>
+        </div>
+
+        <div class="card">
+          <h3>Ghi Chú Nhanh</h3>
+          <textarea id="quickNote" placeholder="Viết ghi chú hoặc ý tưởng học tập vào đây..."></textarea>
+          <button onclick="saveNote()">Lưu ghi chú</button>
+          <p id="noteStatus" style="font-size: 0.8rem; color: var(--accent-green); margin-top: 0.3rem;"></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // 1. Logic Đếm ngược thời gian
+    const targetDate = new Date("2026-11-25T08:00:00").getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById("timer").innerText = `${days}d : ${hours}h`;
+      } else {
+        document.getElementById("timer").innerText = "Đã đến giờ thi!";
+      }
+    }, 1000);
+
+    // 2. Logic Thêm / Xóa Task
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const priority = document.getElementById("prioritySelect").value;
+      if (!input.value.trim()) return alert("Vui lòng nhập tên bài tập!");
+
+      let badgeClass = "badge-green";
+      if (priority === "Gấp") badgeClass = "badge-red";
+      if (priority === "Quan trọng") badgeClass = "badge-yellow";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input type="checkbox"></td>
+        <td>${input.value}</td>
+        <td><span class="badge ${badgeClass}">${priority}</span></td>
+        <td><button onclick="deleteTask(this)" style="background:var(--accent-red)">Xóa</button></td>
+      `;
+      document.getElementById("taskList").appendChild(tr);
+      input.value = "";
+    }
+
+    function deleteTask(btn) {
+      btn.closest("tr").remove();
+    }
+
+    // 3. Logic Tính GPA Dự Phóng
+    function calculateGPA() {
+      const credits = document.querySelectorAll(".credits");
+      const grades = document.querySelectorAll(".grade");
+      let totalPoints = 0;
+      let totalCredits = 0;
+
+      for (let i = 0; i < credits.length; i++) {
+        const c = parseFloat(credits[i].value) || 0;
+        const g = parseFloat(grades[i].value) || 0;
+        totalPoints += c * g;
+        totalCredits += c;
+      }
+
+      const gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+      document.getElementById("gpaResult").innerText = gpa;
+    }
+
+    // 4. Logic Lưu Ghi chú
+    function saveNote() {
+      const note = document.getElementById("quickNote").value;
+      localStorage.setItem("student_note", note);
+      const status = document.getElementById("noteStatus");
+      status.innerText = "✓ Đã lưu vào bộ nhớ trình duyệt!";
+      setTimeout(() => status.innerText = "", 2000);
+    }
+
+    // Load ghi chú cũ khi mở trang
+    window.onload = () => {
+      const savedNote = localStorage.getItem("student_note");
+      if (savedNote) document.getElementById("quickNote").value = savedNote;
+      calculateGPA();
+    };
+  </script>
+</body>
+</html>
